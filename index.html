@@ -1,0 +1,36 @@
+<html>
+<head>
+<title></title>
+<meta charset="utf-8">
+</head>
+
+<body>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
+<script src="plugin/underscore.string.js" charset="utf-8"></script>
+<script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="dom-visualization/visualizer.js" charset="utf-8"></script>
+<script src="dom-visualization/node.js" charset="utf-8"></script>
+<script src="dom-visualization/util.js" charset="utf-8"></script>
+<script>
+    $(function () {
+        var w = 1200,
+            h = 1200,
+            svg = d3.select("body")
+                .append("svg")
+                .attr("width", w)
+                .attr("height", h),
+            demo_url = "target.html",
+            dv = new DOM_VISUALIZER.Visualizer(svg);
+
+        $.ajax({
+            url: demo_url,
+            detaType: "html"
+        }).done(function (html) {
+            dv.init(html);
+        });
+
+    });
+</script>
+</body>
+</html>
