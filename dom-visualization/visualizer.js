@@ -14,22 +14,36 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
             nodes = [],
             min_margin_horizontal = 30,
             min_margin_vertical = 30,
-            truncate_text_length = 5;
+            truncate_text_length = 5,
+            offset = d3_svg.attr("width") / 2;
 
         function compute_positions() {
+//            var width = 0;
             _.each(nodes, function (node) {
                 node.y = min_margin_vertical * node.depth;
-                node.x = Math.random() * 500;
+                node.x = Math.random() * 1000;
             });
         }
 
         function draw_nodes() {
+            svg.selectAll('circle')
+                .data(nodes, function (d) { return d.id; })
+                .enter()
+                .append('circle')
+                .attr('cx', function (d) { return d.x; })
+                .attr('cy', function (d) { return d.y; })
+                .attr('r', function (d) { return d.r; })
+                .attr('fill', '#1abc9c');
+        }
+
+        function draw_texts() {
             svg.selectAll('text')
                 .data(nodes, function (d) { return d.id; })
                 .enter()
                 .append('text')
-                .attr('x', function (d) { return d.x; })
+                .attr('x', function (d) { return d.x - d.r / 2; })
                 .attr('y', function (d) { return d.y; })
+                .attr('fill', 'black')
                 .text(function (d) {
                     // 表示テキストは後で調整する
                     return d.name || (_.isString(d.text) ? _.truncate(d.text, truncate_text_length) : 'null');
@@ -46,7 +60,7 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
                     .attr('y1', parent.y)
                     .attr('x2', function (d) { return d.x; })
                     .attr('y2', function (d) { return d.y; })
-                    .attr('stroke', 'blue')
+                    .attr('stroke', '#e67e22')
                     .attr('stroke-width', 1);
             });
         }
@@ -80,8 +94,9 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
 
         that.update = function update() {
             compute_positions();
-            draw_nodes();
             draw_edges();
+            draw_nodes();
+            draw_texts();
         };
     };
 
