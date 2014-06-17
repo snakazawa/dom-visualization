@@ -20,41 +20,34 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
             truncate_text_length = 5;
 
         function compute_positions() {
-
+            _.each(nodes, function (node) {
+                node.y = min_margin_vertical * node.depth;
+                node.x = Math.random() * 500;
+            });
         }
 
-        function draw_all() {
-            // 仮
+        function draw_nodes() {
             svg.selectAll('text')
                 .data(nodes)
                 .enter()
                 .append('text')
-                .attr('x', function (d, i) {
-                    return d.x = 10 + i * 50;
-                })
-                .attr('y', function (d) {
-                    return d.y = d.depth * 50;
-                })
+                .attr('x', function (d) { return d.x; })
+                .attr('y', function (d) { return d.y; })
                 .text(function (d) {
+                    // 表示テキストは後で調整する
                     return d.name || (_.isString(d.text) ? _.truncate(d.text, truncate_text_length) : 'null');
                 });
+        }
 
+        function draw_edges() {
             svg.selectAll('line')
                 .data(edges)
                 .enter()
                 .append('line')
-                .attr('x1', function (d) {
-                    return d.from.x;
-                })
-                .attr('y1', function (d) {
-                    return d.from.y;
-                })
-                .attr('x2', function (d) {
-                    return d.to.x;
-                })
-                .attr('y2', function (d) {
-                    return d.to.y;
-                })
+                .attr('x1', function (d) { return d.from.x; })
+                .attr('y1', function (d) { return d.from.y; })
+                .attr('x2', function (d) { return d.to.x; })
+                .attr('y2', function (d) { return d.to.y; })
                 .attr('stroke', 'blue')
                 .attr('stroke-width', 1);
         }
@@ -93,7 +86,8 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
 
         that.update = function update() {
             compute_positions();
-            draw_all();
+            draw_edges();
+            draw_nodes();
         };
     };
 
