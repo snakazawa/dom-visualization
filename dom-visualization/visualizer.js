@@ -15,22 +15,21 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
             min_margin_horizontal = 30,
             min_margin_vertical = 30,
             truncate_text_length = 5,
-            offset = d3_svg.attr("width") / 2;
+            offset = d3_svg.attr('width') / 2;
 
         function compute_positions() {
             compute_need_width();
 
             nodes[0].x = 0;
             nodes[0].y = nodes[0].r * 2 + 10;
-            (function solve (node) {
+            (function solve(node) {
                 var l = node.x - node.need_width / 2,
                     y = node.y + min_margin_vertical;
 
                 _.each(node.childs, function (child) {
                     child.y = y;
-                    child.x = l + child.r;
-                    console.log(child.y, child.x);
-                    l += child.r * 2 + min_margin_horizontal;
+                    child.x = l + child.w / 2;
+                    l += child.w;
                     solve(child);
                 });
             }(nodes[0]));
@@ -62,12 +61,15 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
                 }
 
                 if (!node.childs.length) {
-                    return node.need_width = node.r * 2;
+                    node.need_width = node.r * 2;
+                    return node.need_width;
+                } else {
+                    node.need_width = _.reduce(node.childs, function (sum, child) {
+                        return sum + solve(child);
+                    }, (node.childs.length - 1) * min_margin_horizontal);
                 }
 
-                return node.need_width = _.reduce(node.childs, function (sum, child) {
-                    return sum + solve(child);
-                }, (node.childs.length - 1) * min_margin_horizontal);
+                return node.need_width;
             };
 
             _.each(nodes, solve);
