@@ -13,9 +13,10 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
         this.id = id++;
         this.x = 0;
         this.y = 0;
-        this.r = 30;
+        this.rx = 0;
+        this.ry = 0;
         // 子ノードも含めた必要な横幅
-        this.need_width = null;
+        this.need_width = 0;
         this.type = ele.nodeType;
         this.name = ns.util.decodeTagName(ele.tagName);
         this.text = _.isString(ele.nodeValue) ? ele.nodeValue.trim() : null;

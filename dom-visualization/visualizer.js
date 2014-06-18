@@ -12,24 +12,30 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
             svg = d3_svg,
             dom,
             nodes = [],
-            min_margin_horizontal = 30,
-            min_margin_vertical = 30,
-            truncate_text_length = 5,
+            min_margin_horizontal = 15,
+            min_margin_vertical = 80,
+            font_size = 14,
+            node_rx = 35,
+            node_ry = 20,
             offset = d3_svg.attr('width') / 2;
 
+        /**
+         * 各ノードの配置を計算する
+         *
+         */
         function compute_positions() {
             compute_need_width();
 
             nodes[0].x = 0;
-            nodes[0].y = nodes[0].r * 2 + 10;
+            nodes[0].y = nodes[0].rx * 2 + 10;
             (function solve(node) {
                 var l = node.x - node.need_width / 2,
                     y = node.y + min_margin_vertical;
 
                 _.each(node.childs, function (child) {
                     child.y = y;
-                    child.x = l + child.w / 2;
-                    l += child.w;
+                    child.x = l + child.need_width / 2;
+                    l += child.need_width + min_margin_horizontal;
                     solve(child);
                 });
             }(nodes[0]));
@@ -61,11 +67,11 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
                 }
 
                 if (!node.childs.length) {
-                    node.need_width = node.r * 2;
+                    node.need_width = node.rx * 2;
                     return node.need_width;
                 } else {
                     node.need_width = _.reduce(node.childs, function (sum, child) {
-                        return sum + solve(child);
+                        return sum + solve(child, node.childs.length > 1);
                     }, (node.childs.length - 1) * min_margin_horizontal);
                 }
 
@@ -82,13 +88,14 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
         }
 
         function draw_nodes() {
-            svg.selectAll('circle')
+            svg.selectAll('ellipse')
                 .data(nodes, function (d) { return d.id; })
                 .enter()
-                .append('circle')
+                .append('ellipse')
                 .attr('cx', function (d) { return d.x; })
                 .attr('cy', function (d) { return d.y; })
-                .attr('r', function (d) { return d.r; })
+                .attr('rx', function (d) { return d.rx; })
+                .attr('ry', function (d) { return d.ry; })
                 .attr('fill', '#1abc9c');
         }
 
@@ -97,12 +104,15 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
                 .data(nodes, function (d) { return d.id; })
                 .enter()
                 .append('text')
-                .attr('x', function (d) { return d.x - d.r / 2; })
-                .attr('y', function (d) { return d.y; })
+                .attr('text-anchor', 'middle')
+                .attr('x', function (d) { return d.x; })
+                .attr('y', function (d) { return d.y + font_size / 4; })
                 .attr('fill', 'black')
+                .attr('font-size', font_size)
                 .text(function (d) {
                     // 表示テキストは後で調整する
-                    return d.name || (_.isString(d.text) ? _.truncate(d.text, truncate_text_length) : 'null');
+//                    return d.name || (_.isString(d.text) ? _.truncate(d.text, truncate_text_length) : 'null');
+                    return d.name ? ('<' + d.name + '>') : '#text';
                 });
         }
 
@@ -124,7 +134,9 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
         function create_node(ele, depth, parent) {
             var node = new ns.Node(ele, {
                 depth: depth,
-                parent: parent
+                parent: parent,
+                rx: node_rx,
+                ry: node_ry
             });
             nodes.push(node);
 
