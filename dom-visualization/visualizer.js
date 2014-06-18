@@ -18,10 +18,64 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
             offset = d3_svg.attr("width") / 2;
 
         function compute_positions() {
-//            var width = 0;
+            compute_need_width();
+
+            nodes[0].x = 0;
+            nodes[0].y = nodes[0].r * 2 + 10;
+            (function solve (node) {
+                var l = node.x - node.need_width / 2,
+                    y = node.y + min_margin_vertical;
+
+                _.each(node.childs, function (child) {
+                    child.y = y;
+                    child.x = l + child.r;
+                    console.log(child.y, child.x);
+                    l += child.r * 2 + min_margin_horizontal;
+                    solve(child);
+                });
+            }(nodes[0]));
+
             _.each(nodes, function (node) {
-                node.y = min_margin_vertical * node.depth;
-                node.x = Math.random() * 1000;
+                node.x += offset;
+            });
+        }
+
+        /**
+         * 子ノードも含めた必要な横幅を計算する
+         * V = ノードの集合
+         * Vi ∈ V, Vj ∈ Viの子ノード, n = Viの子ノードの数,
+         * h = 兄弟ノード間の最小マージン
+         * Vir = Viの半径, Viw = Viの必要な横幅 とすると
+         * Viw = {
+         *   2r (n = 0),
+         *   Σ[j=0...n-1](Vjr) + (n - 1) * v (n != 0)
+         * }
+         * となる
+         *
+         */
+        function compute_need_width() {
+            reset_need_width();
+
+            var solve = function (node) {
+                if (node.need_width) {
+                    return node.need_width;
+                }
+
+                if (!node.childs.length) {
+                    return node.need_width = node.r * 2;
+                }
+
+                return node.need_width = _.reduce(node.childs, function (sum, child) {
+                    return sum + solve(child);
+                }, (node.childs.length - 1) * min_margin_horizontal);
+            };
+
+            _.each(nodes, solve);
+        }
+
+        function reset_need_width() {
+            _.each(nodes, function () {
+                nodes.need_width = null;
             });
         }
 
