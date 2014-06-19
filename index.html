@@ -7,27 +7,31 @@
 <body>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
-<script src="plugin/underscore.string.js" charset="utf-8"></script>
 <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="plugin/underscore.string.js" charset="utf-8"></script>
+<script src="plugin/jquery.xdomainajax.js" charset="utf-8"></script>
 <script src="dom-visualization/visualizer.js" charset="utf-8"></script>
 <script src="dom-visualization/node.js" charset="utf-8"></script>
 <script src="dom-visualization/util.js" charset="utf-8"></script>
 <script>
     $(function () {
-        var w = 1500,
+        var w = 2000,
             h = 2000,
             svg = d3.select("body")
                 .append("svg")
                 .attr("width", w)
                 .attr("height", h),
-            demo_url = "target.html",
+            demo_url = "target.html", is_origin_domain = true,
+//            demo_url =  "http://earthsoft.jp/", is_origin_domain = false,
             dv = new DOM_VISUALIZER.Visualizer(svg);
 
-        $.ajax({
+        $[is_origin_domain ? 'ajax' : 'ajax2']({
             url: demo_url,
-            detaType: "html"
-        }).done(function (html) {
-            dv.init(html);
+            type: "GET",
+            detaType: "html",
+            crossDomain: true
+        }).done(function (data) {
+            dv.init(is_origin_domain ? data : data.results[0]);
         });
 
     });
