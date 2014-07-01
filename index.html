@@ -1,13 +1,53 @@
 <html>
 <head>
-<title></title>
+<title>DOM-Visualizer</title>
 <meta charset="utf-8">
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+<style>
+    #dom-visualizer {
+        max-width: 1600px;
+        position: relative;
+        margin: auto;
+    }
+
+    #dom-visualizer .visualizer-form {
+        width: 400px;
+        height: 800px;
+        float: right;
+        right: 0;
+    }
+
+    #dom-visualizer .visualizer-form #visualizer-text {
+        width: 400px;
+        height: 775px;
+    }
+
+    #dom-visualizer #dom-view {
+        height: 800px;
+        width: 1200px;
+        display: inline-block;
+        position: absolute;
+    }
+</style>
 </head>
 
 <body>
+
+<div id="dom-visualizer">
+    <svg id="dom-view" xmlns="http://www.w3.org/2000/svg" version="1.1"></svg>
+
+    <form class="visualizer-form" role="from">
+        <div class="form-group">
+            <label for="visualizer-text">HTML</label>
+            <textarea id="visualizer-text" class="form-control">hoge</textarea>
+        </div>
+    </form>
+</div>
+
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
 <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 <script src="plugin/underscore.string.js" charset="utf-8"></script>
 <script src="plugin/jquery.xdomainajax.js" charset="utf-8"></script>
 <script src="dom-visualization/visualizer.js" charset="utf-8"></script>
@@ -15,12 +55,12 @@
 <script src="dom-visualization/util.js" charset="utf-8"></script>
 <script>
     $(function () {
-        var w = 2000,
-            h = 2000,
-            svg = d3.select("body")
-                .append("svg")
+        var w = 1066,
+            h = 800,
+            svg = d3.select("#dom-view")
                 .attr("width", w)
                 .attr("height", h),
+            text_form = d3.select("#visualizer-text"),
             demo_url = "target.html", is_origin_domain = true,
 //            demo_url =  "http://earthsoft.jp/", is_origin_domain = false,
             dv = new DOM_VISUALIZER.Visualizer(svg);
@@ -31,7 +71,9 @@
             detaType: "html",
             crossDomain: true
         }).done(function (data) {
-            dv.init(is_origin_domain ? data : data.results[0]);
+            var html = is_origin_domain ? data : data.results[0];
+            text_form.text(html);
+            dv.init(html);
         });
 
     });
