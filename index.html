@@ -37,8 +37,9 @@
 <div id="dom-visualizer">
     <div class="visualizer-source-group">
         <label for="visualizer-url">URL</label>
-        <input type="url" id="visualizer-url" class="form-control" placeholder="http://example.hoge">
-        <button type="button">Submit</button>
+        <input type="url" id="visualizer-url" class="form-control" placeholder="http://example.hoge"
+                value="target.html">
+        <button type="button" id="visualizer-url-submit">Submit</button>
     </div>
 
     <svg id="dom-view" xmlns="http://www.w3.org/2000/svg" version="1.1"></svg>
@@ -63,41 +64,51 @@
     $(function () {
         var w = 1066,
             h = 800,
-            svg = d3.select("#dom-view")
-                .attr("width", w)
-                .attr("height", h),
-            text_form = $("#visualizer-text"),
-            source_form = $("#visualizer-url"),
-            demo_url = "target.html", is_origin_domain = true,
-//            demo_url =  "http://earthsoft.jp/", is_origin_domain = false,
+            svg = d3.select('#dom-view')
+                .attr('width', w)
+                .attr('height', h),
+            text_form = $('#visualizer-text'),
+            source_form = $('#visualizer-url'),
+            source_form_submit = $('#visualizer-url-submit'),
+//            demo_url =  'http://earthsoft.jp/',
             dv = new DOM_VISUALIZER.Visualizer(svg);
 
-        text_form.on("input", function (e) {
+        source_form_submit.click(function (e) {
+            var url = source_form.val();
+            get_html(url);
+        });
+
+        text_form.bind('input', function (e) {
             var html = text_form.val();
-//            html = html.replace("&gt;", ">");
-//            html = html.  replace("&lt;", "<");
-//            console.log(html);
-            try {
-                html = decodeURIComponent(html);
-            } catch (e) {
-                console.log(e);
-                return;
-            }
+//            try {
+//                html = decodeURIComponent(html);
+//            } catch (e) {
+//                console.log(e);
+//                return;
+//            }
+            dv.init('');
             dv.init(html);
         });
 
-        $[is_origin_domain ? 'ajax' : 'ajax2']({
-            url: demo_url,
-            type: "GET",
-            detaType: "html",
-            crossDomain: true
-        }).done(function (data) {
-            var html = is_origin_domain ? data : data.results[0];
-            source_form.val(demo_url);
-            text_form.val(html);
-            dv.init(html);
-        });
+        dv.init('');
 
+        // test用に
+//        source_form_submit.click();
+
+        function get_html(url) {
+            var schema = url.slice(0, 7);
+            var is_origin_domain = schema !== 'http://' && schema !== 'https:/';
+            $[is_origin_domain ? 'ajax' : 'ajax2']({
+                url: url,
+                type: 'GET',
+                detaType: 'html',
+                crossDomain: true
+            }).done(function (data) {
+                var html = is_origin_domain ? data : data.results[0];
+                text_form.val(html);
+                dv.init(html);
+            });
+        }
     });
 </script>
 </body>
