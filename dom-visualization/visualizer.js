@@ -88,10 +88,13 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
         }
 
         function draw_nodes() {
-            svg.selectAll('ellipse')
-                .data(nodes, function (d) { return d.id; })
-                .enter()
-                .append('ellipse')
+            var ellipse = svg.selectAll('ellipse').data(nodes, function (d) { return d.id; });
+
+            ellipse.enter().append('ellipse');
+
+            ellipse.exit().remove();
+
+            ellipse
                 .attr('cx', function (d) { return d.x; })
                 .attr('cy', function (d) { return d.y; })
                 .attr('rx', function (d) { return d.rx; })
@@ -100,13 +103,10 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
         }
 
         function draw_texts() {
-            svg.selectAll('text')
-                .data(nodes, function (d) { return d.id; })
-                .enter()
-                .append('text')
+            var text = svg.selectAll('text').data(nodes, function (d) { return d.id; });
+
+            text.enter().append('text')
                 .attr('text-anchor', 'middle')
-                .attr('x', function (d) { return d.x; })
-                .attr('y', function (d) { return d.y + font_size / 4; })
                 .attr('fill', 'black')
                 .attr('font-size', font_size)
                 .text(function (d) {
@@ -114,21 +114,40 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
 //                    return d.name || (_.isString(d.text) ? _.truncate(d.text, truncate_text_length) : 'null');
                     return d.name ? ('<' + d.name + '>') : '#text';
                 });
+
+            text.exit().remove();
+
+            text
+                .attr('x', function (d) { return d.x; })
+                .attr('y', function (d) { return d.y + font_size / 4; });
         }
 
         function draw_edges() {
+            var edges = [], line;
+
             _.each(nodes, function (parent) {
-                svg.selectAll('line')
-                    .data(parent.childs, function (d) { return parent.id + '-' + d.id; })
-                    .enter()
-                    .append('line')
-                    .attr('x1', parent.x)
-                    .attr('y1', parent.y)
-                    .attr('x2', function (d) { return d.x; })
-                    .attr('y2', function (d) { return d.y; })
-                    .attr('stroke', '#e67e22')
-                    .attr('stroke-width', 1);
+                _.each(parent.childs, function (child) {
+                    edges.push({
+                        parent: parent,
+                        child: child
+                    });
+                });
             });
+
+            line = svg.selectAll('line').data(edges, function (d) { return d.parent.id + '-' + d.child.id; });
+
+            line.enter().append('line')
+                .attr('stroke', '#e67e22')
+                .attr('stroke-width', 1);
+
+            line.exit().remove();
+
+            line
+                .attr('x1', function (d) { return d.parent.x; })
+                .attr('y1', function (d) { return d.parent.y; })
+                .attr('x2', function (d) { return d.child.x; })
+                .attr('y2', function (d) { return d.child.y; });
+
         }
 
         function create_node(ele, depth, parent) {
@@ -155,6 +174,7 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
             dom = document.createElement('Root');
             dom.innerHTML = ns.util.replaceTagNames(dom_text);
             nodes = [];
+            ns.Node.prototype.reset();
             create_node(dom, 1);
 
             that.update();

@@ -2,31 +2,32 @@
 <head>
 <title>DOM-Visualizer</title>
 <meta charset="utf-8">
-<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
 <style>
     #dom-visualizer {
-        max-width: 1600px;
-        position: relative;
+        width: 1600px;
         margin: auto;
     }
 
-    #dom-visualizer .visualizer-form {
+    #dom-visualizer .visualizer-text-form {
         width: 400px;
         height: 800px;
         float: right;
         right: 0;
     }
 
-    #dom-visualizer .visualizer-form #visualizer-text {
+    #dom-visualizer .visualizer-text-form #visualizer-text {
         width: 400px;
         height: 775px;
     }
 
     #dom-visualizer #dom-view {
+        float: left;
         height: 800px;
         width: 1200px;
-        display: inline-block;
-        position: absolute;
+    }
+
+    #dom-visualizer .visualizer-source-group #visualizer-url {
+        width: 800px;
     }
 </style>
 </head>
@@ -34,12 +35,18 @@
 <body>
 
 <div id="dom-visualizer">
+    <div class="visualizer-source-group">
+        <label for="visualizer-url">URL</label>
+        <input type="url" id="visualizer-url" class="form-control" placeholder="http://example.hoge">
+        <button type="button">Submit</button>
+    </div>
+
     <svg id="dom-view" xmlns="http://www.w3.org/2000/svg" version="1.1"></svg>
 
-    <form class="visualizer-form" role="from">
+    <form class="form visualizer-text-form" role="from">
         <div class="form-group">
             <label for="visualizer-text">HTML</label>
-            <textarea id="visualizer-text" class="form-control">hoge</textarea>
+            <textarea id="visualizer-text" class="form-control" autofocus></textarea>
         </div>
     </form>
 </div>
@@ -47,7 +54,6 @@
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
 <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
-<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 <script src="plugin/underscore.string.js" charset="utf-8"></script>
 <script src="plugin/jquery.xdomainajax.js" charset="utf-8"></script>
 <script src="dom-visualization/visualizer.js" charset="utf-8"></script>
@@ -60,10 +66,25 @@
             svg = d3.select("#dom-view")
                 .attr("width", w)
                 .attr("height", h),
-            text_form = d3.select("#visualizer-text"),
+            text_form = $("#visualizer-text"),
+            source_form = $("#visualizer-url"),
             demo_url = "target.html", is_origin_domain = true,
 //            demo_url =  "http://earthsoft.jp/", is_origin_domain = false,
             dv = new DOM_VISUALIZER.Visualizer(svg);
+
+        text_form.on("input", function (e) {
+            var html = text_form.val();
+//            html = html.replace("&gt;", ">");
+//            html = html.  replace("&lt;", "<");
+//            console.log(html);
+            try {
+                html = decodeURIComponent(html);
+            } catch (e) {
+                console.log(e);
+                return;
+            }
+            dv.init(html);
+        });
 
         $[is_origin_domain ? 'ajax' : 'ajax2']({
             url: demo_url,
@@ -72,7 +93,8 @@
             crossDomain: true
         }).done(function (data) {
             var html = is_origin_domain ? data : data.results[0];
-            text_form.text(html);
+            source_form.val(demo_url);
+            text_form.val(html);
             dv.init(html);
         });
 

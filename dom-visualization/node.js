@@ -25,4 +25,8 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
         _.extend(this, o);
     };
 
+    ns.Node.prototype.reset = function () {
+        id = 0;
+    };
+
 }(DOM_VISUALIZER || {}));
