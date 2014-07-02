@@ -108,18 +108,18 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
             text.enter().append('text')
                 .attr('text-anchor', 'middle')
                 .attr('fill', 'black')
-                .attr('font-size', font_size)
-                .text(function (d) {
-                    // 表示テキストは後で調整する
-//                    return d.name || (_.isString(d.text) ? _.truncate(d.text, truncate_text_length) : 'null');
-                    return d.name ? ('<' + d.name + '>') : '#text';
-                });
+                .attr('font-size', font_size);
 
             text.exit().remove();
 
             text
                 .attr('x', function (d) { return d.x; })
-                .attr('y', function (d) { return d.y + font_size / 4; });
+                .attr('y', function (d) { return d.y + font_size / 4; })
+                .text(function (d) {
+                    // 表示テキストは後で調整する
+//                    return d.name || (_.isString(d.text) ? _.truncate(d.text, truncate_text_length) : 'null');
+                    return d.name ? ('<' + d.name + '>') : '#text';
+                });
         }
 
         function draw_edges() {

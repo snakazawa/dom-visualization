@@ -80,13 +80,6 @@
 
         text_form.bind('input', function (e) {
             var html = text_form.val();
-//            try {
-//                html = decodeURIComponent(html);
-//            } catch (e) {
-//                console.log(e);
-//                return;
-//            }
-            dv.init('');
             dv.init(html);
         });
 
