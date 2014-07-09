@@ -3,6 +3,8 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
 (function (ns) {
     'use strict';
 
+    var z_order = ['line', 'node', 'text'];
+
     /**
      *
      * @constructor
@@ -103,7 +105,8 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
         }
 
         function draw_texts() {
-            var text = svg.selectAll('text').data(nodes, function (d) { return d.id; });
+            var texts = _.map(nodes, function (node) { return node.text; });
+            var text = svg.selectAll('text').data(texts, function (d) { return d.node.id; });
 
             text.enter().append('text')
                 .attr('text-anchor', 'middle')
@@ -113,13 +116,9 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
             text.exit().remove();
 
             text
-                .attr('x', function (d) { return d.x; })
-                .attr('y', function (d) { return d.y + font_size / 4; })
-                .text(function (d) {
-                    // 表示テキストは後で調整する
-//                    return d.name || (_.isString(d.text) ? _.truncate(d.text, truncate_text_length) : 'null');
-                    return d.name ? ('<' + d.name + '>') : '#text';
-                });
+                .attr('x', function (d) { return d.node.x; })
+                .attr('y', function (d) { return d.node.y + font_size / 4; })
+                .text(function (d) { return d.displayText; });
         }
 
         function draw_edges() {
@@ -128,6 +127,7 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
             _.each(nodes, function (parent) {
                 _.each(parent.childs, function (child) {
                     edges.push({
+                        name: 'line',
                         parent: parent,
                         child: child
                     });
@@ -136,13 +136,13 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
 
             line = svg.selectAll('line').data(edges, function (d) { return d.parent.id + '-' + d.child.id; });
 
-            line.enter().append('line')
-                .attr('stroke', '#e67e22')
-                .attr('stroke-width', 1);
+            line.enter().append('line');
 
             line.exit().remove();
 
             line
+                .attr('stroke', '#e67e22')
+                .attr('stroke-width', 1)
                 .attr('x1', function (d) { return d.parent.x; })
                 .attr('y1', function (d) { return d.parent.y; })
                 .attr('x2', function (d) { return d.child.x; })
@@ -170,6 +170,12 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
             return node;
         }
 
+        function z_sort() {
+            svg.selectAll("*").sort(function (a, b) {
+                return z_order.indexOf(a.name) - z_order.indexOf(b.name);
+            });
+        }
+
         that.init = function init(dom_text) {
             dom = document.createElement('Root');
             dom.innerHTML = ns.util.replaceTagNames(dom_text);
@@ -185,6 +191,7 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
             draw_edges();
             draw_nodes();
             draw_texts();
+            z_sort();
         };
     };
 

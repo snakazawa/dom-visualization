@@ -10,6 +10,8 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
      * @constructor
      */
     ns.Node = function Node(ele, o) {
+        var that = this;
+        this.name = 'node';
         this.id = id++;
         this.x = 0;
         this.y = 0;
@@ -18,8 +20,13 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
         // 子ノードも含めた必要な横幅
         this.need_width = 0;
         this.type = ele.nodeType;
-        this.name = ns.util.decodeTagName(ele.tagName);
-        this.text = _.isString(ele.nodeValue) ? ele.nodeValue.trim() : null;
+        this.tagName = ns.util.decodeTagName(ele.tagName);
+        this.text = {
+            name: 'text',
+            node: that,
+            value: _.isString(ele.nodeValue) ? ele.nodeValue.trim() : null,
+            displayText: that.tagName ? ('<' + that.tagName + '>') : '#text'
+        };
         this.parent = null;
         this.childs = [];
         _.extend(this, o);

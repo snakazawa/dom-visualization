@@ -31,20 +31,19 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
         }
 
         function draw_texts() {
+            var texts = _.map(nodes, function (node) { return node.text; });
+            console.log(texts);
+
             svg.selectAll('text')
-                .data(nodes, function (d) { return d.id; })
+                .data(texts, function (d) { return d.node.id; })
                 .enter()
                 .append('text')
                 .attr('text-anchor', 'middle')
-                .attr('x', function (d) { return d.x; })
-                .attr('y', function (d) { return d.y + font_size / 4; })
+                .attr('x', function (d) { return d.node.x; })
+                .attr('y', function (d) { return d.node.y + font_size / 4; })
                 .attr('fill', 'black')
                 .attr('font-size', font_size)
-                .text(function (d) {
-                    // 表示テキストは後で調整する
-//                    return d.name || (_.isString(d.text) ? _.truncate(d.text, truncate_text_length) : 'null');
-                    return d.name ? ('<' + d.name + '>') : '#text';
-                });
+                .text(function (d) { return d.displayText; });
         }
 
         function draw_edges() {
