@@ -12,6 +12,7 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
     ns.Visualizer = function Visualizer(d3_svg) {
         var that = this,
             svg = d3_svg,
+            zoom,
             dom,
             nodes = [],
             min_margin_horizontal = 15,
@@ -20,6 +21,20 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
             node_rx = 35,
             node_ry = 20,
             offset = d3_svg.attr('width') / 2;
+
+        /**
+         * zoom
+         */
+        zoom = d3.behavior.zoom()
+            .scaleExtent([1, 10])
+            .on('zoom', zoomed);
+
+        svg.call(zoom);
+
+        function zoomed() {
+            svg.selectAll('*')
+                .attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+        }
 
         /**
          * 各ノードの配置を計算する
