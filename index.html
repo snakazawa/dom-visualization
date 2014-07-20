@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <style>
     #dom-visualizer {
-        width: 1600px;
+        width: 1280px;
         margin: auto;
     }
 
@@ -23,7 +23,7 @@
     #dom-visualizer #dom-view {
         float: left;
         height: 800px;
-        width: 1200px;
+        width: 880px;
     }
 
     #dom-visualizer .visualizer-source-group #visualizer-url {
@@ -62,7 +62,7 @@
 <script src="dom-visualization/util.js" charset="utf-8"></script>
 <script>
     $(function () {
-        var w = 1066,
+        var w = 880,
             h = 800,
             svg = d3.select('#dom-view')
                 .attr('width', w)
@@ -85,8 +85,8 @@
 
         dv.init('');
 
-        // test用に
-//        source_form_submit.click();
+//        test用に
+        source_form_submit.click();
 
         function get_html(url) {
             var schema = url.slice(0, 7);

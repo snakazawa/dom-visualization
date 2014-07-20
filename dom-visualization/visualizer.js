@@ -26,7 +26,7 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
          * zoom
          */
         zoom = d3.behavior.zoom()
-            .scaleExtent([1, 10])
+            .scaleExtent([0.01, 10])
             .on('zoom', zoomed);
 
         svg.call(zoom);
