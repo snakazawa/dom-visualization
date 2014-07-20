@@ -36,6 +36,11 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
                 .attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
         }
 
+        function zoom_reset() {
+            svg.selectAll('*')
+                .attr("transform", "translate(0, 0)scale(1)");
+        }
+
         /**
          * 各ノードの配置を計算する
          *
@@ -123,14 +128,14 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
             var texts = _.map(nodes, function (node) { return node.text; });
             var text = svg.selectAll('text').data(texts, function (d) { return d.node.id; });
 
-            text.enter().append('text')
-                .attr('text-anchor', 'middle')
-                .attr('fill', 'black')
-                .attr('font-size', font_size);
+            text.enter().append('text');
 
             text.exit().remove();
 
             text
+                .attr('text-anchor', 'middle')
+                .attr('fill', 'black')
+                .attr('font-size', font_size)
                 .attr('x', function (d) { return d.node.x; })
                 .attr('y', function (d) { return d.node.y + font_size / 4; })
                 .text(function (d) { return d.displayText; });
@@ -203,6 +208,7 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
 
         that.update = function update() {
             compute_positions();
+            zoom_reset();
             draw_edges();
             draw_nodes();
             draw_texts();
