@@ -25,6 +25,7 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
 
         /**
          * zoom
+         *
          */
         zoom = d3.behavior.zoom()
             .scaleExtent([0.01, 10])
@@ -52,18 +53,18 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
             nodes[0].x = 0;
             nodes[0].y = nodes[0].rx * 2 + 10;
             (function solve(node) {
-                var l = node.x - node.need_width / 2,
+                var l = node.x - node.needWidth / 2,
                     y = node.y + min_margin_vertical;
 
-                _.each(node.childs, function (child) {
+                node.childs.forEach(function (child) {
                     child.y = y;
-                    child.x = l + child.need_width / 2;
-                    l += child.need_width + min_margin_horizontal;
+                    child.x = l + child.needWidth / 2;
+                    l += child.needWidth + min_margin_horizontal;
                     solve(child);
                 });
             }(nodes[0]));
 
-            _.each(nodes, function (node) {
+            nodes.forEach(function (node) {
                 node.x += offset;
             });
         }
@@ -85,28 +86,28 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
             reset_need_width();
 
             var solve = function (node) {
-                if (node.need_width) {
-                    return node.need_width;
+                if (node.needWidth) {
+                    return node.needWidth;
                 }
 
                 if (!node.childs.length) {
-                    node.need_width = node.rx * 2;
-                    return node.need_width;
+                    node.needWidth = node.rx * 2;
+                    return node.needWidth;
                 } else {
-                    node.need_width = _.reduce(node.childs, function (sum, child) {
+                    node.needWidth = node.childs.reduce(function (sum, child) {
                         return sum + solve(child, node.childs.length > 1);
                     }, (node.childs.length - 1) * min_margin_horizontal);
                 }
 
-                return node.need_width;
+                return node.needWidth;
             };
 
-            _.each(nodes, solve);
+            nodes.forEach(solve);
         }
 
         function reset_need_width() {
-            _.each(nodes, function () {
-                nodes.need_width = null;
+            nodes.forEach(function (node) {
+                node.node_width = null;
             });
         }
 
@@ -126,7 +127,7 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
         }
 
         function draw_texts() {
-            var texts = _.map(nodes, function (node) { return node.text; }),
+            var texts = nodes.map(function (node) { return node.text; }),
                 text = svg.selectAll('text').data(texts, function (d) { return d.node.id; });
 
             text.enter().append('text');
@@ -145,8 +146,8 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
         function draw_edges() {
             var edges = [], line;
 
-            _.each(nodes, function (parent) {
-                _.each(parent.childs, function (child) {
+            nodes.forEach(function (parent) {
+                parent.childs.forEach(function (child) {
                     edges.push({
                         name: 'line',
                         parent: parent,

@@ -18,7 +18,7 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
         this.rx = 0;
         this.ry = 0;
         // 子ノードも含めた必要な横幅
-        this.need_width = 0;
+        this.needWidth = 0;
         this.type = ele.nodeType;
         this.tagName = ns.util.decodeTagName(ele.tagName);
         this.text = {

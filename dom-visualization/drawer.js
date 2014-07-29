@@ -14,7 +14,7 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
 
         function reset_need_width() {
             _.each(nodes, function () {
-                nodes.need_width = null;
+                nodes.needWidth = null;
             });
         }
 
