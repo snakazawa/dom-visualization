@@ -3,7 +3,8 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
 (function (ns) {
     'use strict';
 
-    var z_order = ['line', 'node', 'text'];
+    var z_order = ['line', 'node', 'text'],
+        colors = ['#e67e22', '#1abc9c', '', '#3498db'];
 
     /**
      *
@@ -121,7 +122,7 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
                 .attr('cy', function (d) { return d.y; })
                 .attr('rx', function (d) { return d.rx; })
                 .attr('ry', function (d) { return d.ry; })
-                .attr('fill', '#1abc9c');
+                .attr('fill', function (d) { return colors[d.nodeType]; });
         }
 
         function draw_texts() {
@@ -177,6 +178,11 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
                 rx: node_rx,
                 ry: node_ry
             });
+
+            if (depth === 1) {
+                node.nodeType = 0;
+            }
+
             nodes.push(node);
 
             $(ele).contents().filter(function () {
@@ -197,7 +203,7 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
         }
 
         that.init = function init(dom_text) {
-            dom = document.createElement('Root');
+            dom = document.createElement('root');
             dom.innerHTML = ns.util.replaceTagNames(dom_text);
             nodes = [];
             ns.Node.prototype.reset();

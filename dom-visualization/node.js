@@ -29,6 +29,7 @@ var DOM_VISUALIZER = DOM_VISUALIZER || {};
         };
         this.parent = null;
         this.childs = [];
+        this.nodeType = ele.nodeType;
         _.extend(this, o);
     };
 
